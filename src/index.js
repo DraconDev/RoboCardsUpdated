@@ -9,21 +9,32 @@ import { createStore, applyMiddleware, combineReducers } from "redux";
 import { searchRobots, requestRobots } from "./reducers";
 import thunkMiddleware from "redux-thunk";
 import { createLogger } from "redux-logger";
-import {compose} from "redux";
+import { compose } from "redux";
 
 const logger = createLogger();
 
 // Combine actions
 const rootReducer = combineReducers({ searchRobots, requestRobots });
 
+//
+// const middlewares = [thunkMiddleware, logger];
+
+//Check if it's chrome
+const isChrome =
+  !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+console.log("store.js", isChrome);
+
 // Combine Middleware and Chrome Dev tools. Else it doesn't work
-const middleWare = compose(applyMiddleware(thunkMiddleware, logger), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+const middleWare = isChrome
+  ? compose(
+      applyMiddleware(thunkMiddleware, logger),
+      window.__REDUX_DEVTOOLS_EXTENSION__ &&
+        window.__REDUX_DEVTOOLS_EXTENSION__()
+    )
+  : applyMiddleware(thunkMiddleware, logger);
 
 //Store
-const store = createStore(
-  rootReducer,
-  middleWare
-);
+const store = createStore(rootReducer, middleWare);
 
 //Render
 ReactDOM.render(
